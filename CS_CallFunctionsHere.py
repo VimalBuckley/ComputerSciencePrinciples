@@ -1,0 +1,3 @@
+import CS3_Interation
+
+CS3_Interation.rockPaperScissors2(3)
