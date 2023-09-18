@@ -1,3 +1,6 @@
+import CS1_Functions
+import CS2_Conditionals
 import CS3_Interation
+import CS4_WheelOfFortune
 
-CS3_Interation.rockPaperScissors2(3)
+CS4_WheelOfFortune.runGame()

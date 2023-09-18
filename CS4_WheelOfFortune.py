@@ -11,7 +11,7 @@ def runGame(newPhrase = None):
     resetValues()
     if setPhrase(newPhrase):
         evaluateGuess()
-        endGame("\n" + "The phrase was: " + phrase + "\nGame over!")
+        endGame("The phrase was: " + phrase + "\nGame over!")
     
 def resetValues():
     global phrase
@@ -23,6 +23,12 @@ def resetValues():
     phraseAsArray = []
     clueAsArray = []
     numberOfGuesses = 0
+
+def rollWheel():
+    possiblePrizes = [200, 200, 200, 200, 400, 400, 900]
+    prize = random.choice(possiblePrizes)
+    print("\nYou're prize will be: " + str(prize))
+    return prize
 
 def setPhrase(newPhrase = None):
     global phrase
@@ -44,19 +50,27 @@ def setPhrase(newPhrase = None):
 
 def evaluateGuess():
     global numberOfGuesses
+    totalPrize = 0
     while "_" in clueAsArray:
+        inPhrase = False
         numberOfGuesses += 1
         guess = ""
         frequency = 0
-        print("\n" + arrayToString(clueAsArray))
+        prize = rollWheel()
+        print(arrayToString(clueAsArray))
         while not guess in acceptedCharacters:
             guess = input("Guess a uppercase letter: ")
         for i in range(len(phraseAsArray)):
             if guess == phraseAsArray[i]:
                 clueAsArray[i] = guess
                 frequency += 1
+                inPhrase = True  
         print("Number of times " + guess + " appeared: " + str(frequency))
+        if inPhrase:
+            print("You earned " + str(prize) + " dollars")
+            totalPrize += prize
         print("Number of guesses so far: " + str(numberOfGuesses))
+    print("\nIn this game, you earned " + str(totalPrize) + " dollars in total!")
         
 def endGame(endMessage):
     print(endMessage)
@@ -67,5 +81,4 @@ def arrayToString(desiredArray):
         tempString = tempString + element 
     return tempString
 
-runGame("A cat")
 
