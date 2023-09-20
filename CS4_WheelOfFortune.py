@@ -1,84 +1,113 @@
 import random
 
-phrase = ""
-phraseAsArray = []
-clueAsArray = []
-numberOfGuesses = 0
-possiblePhrases = ["A CAT HAS NINE LIVES", "A BLESSING IN DISGUISE", "ANOTHER DAY ANOTHER DOLLAR", "BIG SHOES TO FILL"]
-acceptedCharacters = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-
-def runGame(newPhrase = None):
-    resetValues()
-    if setPhrase(newPhrase):
-        evaluateGuess()
-        endGame("The phrase was: " + phrase + "\nGame over!")
-    
 def resetValues():
+    global score
+    score = 0
     global phrase
-    global phraseAsArray
-    global clue
-    global clueAsArray
-    global numberOfGuesses
     phrase = ""
-    phraseAsArray = []
-    clueAsArray = []
-    numberOfGuesses = 0
+    global lives
+    lives = 3
+    global prize
+    prize = 0
+    global clue
+    clue = ""
+    global guess
+    guess = ""
+    global playGame
+    playGame = True
+    global guessedCharacters
+    guessedCharacters = [" "]
 
-def rollWheel():
-    possiblePrizes = [200, 200, 200, 200, 400, 400, 900]
-    prize = random.choice(possiblePrizes)
-    print("\nYou're prize will be: " + str(prize))
-    return prize
+def getPossiblePhrases():
+    return ["A CAT HAS NINE LIVES", "A BLESSING IN DISGUISE", "ANOTHER DAY ANOTHER DOLLAR", "BIG SHOES TO FILL"]
 
+def getAcceptedInputs():
+    return ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    
 def setPhrase(newPhrase = None):
     global phrase
-    if newPhrase == None:
-        phrase = random.choice(possiblePhrases)
-    else:
+    if newPhrase != None:
         phrase = newPhrase
-        for letter in phrase:
-            if letter not in acceptedCharacters and letter != " ":
-                endGame("\nThe given phrase contains unaccepted characters")
-                return False
+    else:
+        phrase = random.choice(getPossiblePhrases())
+
+def listToString(listToConvert):
+    return "".join(listToConvert)
+
+def convertPhrase():
+    clue = []
     for letter in phrase:
-        phraseAsArray.append(letter)
-        if letter != " ":
-            clueAsArray.append("_")
+        if letter in guessedCharacters:
+            clue.append(letter)
         else:
-            clueAsArray.append(" ")
-    return True
+            clue.append("_")
+    return clue
 
-def evaluateGuess():
-    global numberOfGuesses
-    totalPrize = 0
-    while "_" in clueAsArray:
-        inPhrase = False
-        numberOfGuesses += 1
-        guess = ""
-        frequency = 0
-        prize = rollWheel()
-        print(arrayToString(clueAsArray))
-        while not guess in acceptedCharacters:
-            guess = input("Guess a uppercase letter: ")
-        for i in range(len(phraseAsArray)):
-            if guess == phraseAsArray[i]:
-                clueAsArray[i] = guess
-                frequency += 1
-                inPhrase = True  
-        print("Number of times " + guess + " appeared: " + str(frequency))
-        if inPhrase:
-            print("You earned " + str(prize) + " dollars")
-            totalPrize += prize
-        print("Number of guesses so far: " + str(numberOfGuesses))
-    print("\nIn this game, you earned " + str(totalPrize) + " dollars in total!")
-        
-def endGame(endMessage):
-    print(endMessage)
+def spinWheel():
+    global prize
+    possilblePrizes = [100, 100, 100, 100, 200, 200, 200, 300, 300, 500, "Bankrupt"]
+    print("\nYou spun the wheel!")
+    prize = random.choice(possilblePrizes)
+    if prize == "Bankrupt":
+        possilblePrizes.pop()
+        print("You went bankrupt! Your score is now zero!")
+        print("You're rolling again!")
+        prize = random.choice(possilblePrizes)
+    print("Your possible prize for the next round is", prize, "points! Good luck!")
+     
+def playerGuess():
+    global guess
+    print(listToString(convertPhrase()))
+    validGuess = False
+    guess = input("Choose an uppercase letter: ")
+    while not validGuess:
+        if guess not in getAcceptedInputs():
+            guess = input("That isn't a valid guess. Please guess again: ")
+        elif guess in guessedCharacters:
+            guess = input("You've already guessed that. Please guess again: ")
+        else:
+            validGuess = True
+    guessedCharacters.append(guess)
 
-def arrayToString(desiredArray):
-    tempString = ""
-    for element in desiredArray:
-        tempString = tempString + element 
-    return tempString
+def checkGuess():
+    if guess in phrase:
+        return True
+    return False
 
+def summarizeRound():
+    global lives
+    global score
+    if checkGuess():
+        print("Your guess was in the phrase!")
+        print("Your prize was added to your score!")
+        score += prize
+    else:
+        print("Your guess wasn't in the phrase!")
+        print("You lost a life")
+        lives -= 1
+    print("Stat Summary: Score:", score, "| Lives left:", lives)
+    if lives > 0:
+        if "_" not in convertPhrase():
+            endGame(True)
+    else:
+        endGame(False)
 
+def endGame(won):
+    global playGame
+    playGame = False
+    print("\n")
+    if won:
+        print("Congraulations, you guessed the phrase:", phrase)
+        print("You earned $" + str(score) + "!")
+    else:
+        print("You ran out of lives :(")
+        print("The phrase was:", phrase)
+        print("Game Over!")
+    
+def runGame(gamePhrase = None):
+    resetValues()
+    setPhrase(gamePhrase)
+    while playGame:
+        spinWheel()
+        playerGuess()
+        summarizeRound()
