@@ -31,18 +31,6 @@ def setPhrase(newPhrase = None):
     else:
         phrase = random.choice(getPossiblePhrases())
 
-def setScore(newScore):
-    global score
-    score = newScore
-
-def setPrize(newPrize):
-    global prize
-    prize = newPrize
-
-def setGuess(newGuess):
-    global guess
-    guess = newGuess
-
 def stringToList(stringToConvert):
     tempList = []
     for letter in stringToConvert:
@@ -62,17 +50,19 @@ def convertPhrase():
     return clue
 
 def spinWheel():
+    global prize
     possilblePrizes = [100, 100, 100, 100, 200, 200, 200, 300, 300, 500, "Bankrupt"]
     print("\nYou spun the wheel!")
-    setPrize(random.choice(possilblePrizes))
+    prize = random.choice(possilblePrizes)
     if prize == "Bankrupt":
         possilblePrizes.pop()
         print("You went bankrupt! Your score is now zero!")
         print("You're rolling again!")
-        setPrize(random.choice(possilblePrizes))
+        prize = random.choice(possilblePrizes)
     print("Your possible prize for the next round is", prize, "points! Good luck!")
      
 def playerGuess():
+    global guess
     print(listToString(convertPhrase()))
     validGuess = False
     guess = input("Choose an uppercase letter: ")
@@ -83,7 +73,6 @@ def playerGuess():
             guess = input("You've already guessed that. Please guess again: ")
         else:
             validGuess = True
-    setGuess(guess)
     guessedCharacters.append(guess)
 
 def checkGuess():
@@ -93,10 +82,11 @@ def checkGuess():
 
 def summarizeRound():
     global lives
+    global score
     if checkGuess():
         print("Your guess was in the phrase!")
         print("Your prize was added to your score!")
-        setScore(score + prize)
+        score += prize
     else:
         print("Your guess wasn't in the phrase!")
         print("You lost a life")
