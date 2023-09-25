@@ -11,11 +11,14 @@ class enemy:
 atkMin = 1
 atkMax = 6
 
+rabbitFightCount  = 0
+
 deathByHidingInCave = [" You stay in the cave. \n\n\n\n\n\n", " You are still in the cave. \n\n\n\n\n\n", " Why are you here again? \n\n\n\n\n\n", "Are you ever going to leave? \n\n\n\n\n\n\n"]
 deathByRabbit = [" You were obliterated by a rabbit...\n ... somehow."]
 deathByHidingFromAuthorities1 = [" You decided to hide from the authorities.", " First, you went into the woods and built a house.", " You lived there for 71 years, without seeing anyone else.", " Then, without warning, a team of 7 authorities appeared in your house while you were eating lunch and apprehended you."]
 deathByHidingFromAuthorities2 = [" You decided to hide from the authorities.", " First, you went into the woods and built a house.", " You lived there for 71 years, without seeing anyone else.", " Then, the ground starts moving.", " The Lion appears behind you and obliterates you, your house, and the entire earth."]
 deathByLion = [" You were obliterated by The Lion in one attack.", " In just three days, the rest of the world have been destroyed by The Lion's claws."]
+deathByWaitingTooLong = [" You killed the rabbit..."," ...but you hear fighting oustide the cave!"," You realize the lion took over the world while you were fighting rabbits!"," You are the only one left!"," You turn and see the lion"," You have fought 7 rabbits. You can fight the lion...right?"," ...right?"," right?"]
 rabbit = enemy("rabbit", 0,3)
 lion = enemy("lion", 3, 8)
 
@@ -34,9 +37,13 @@ def choose(option1, option2):
     return choice == option1
 
 def win():
-    print("\n The lion approaches.\n You are scared \n The lion attacks.\n You step to the side. \n The lion falls to the ground. \n You attack.\n The lion can't dodge it.")
-    print("You won")
-    print(":D")
+    if rabbitFightCount > 5:
+        message = ["You won, but now what?","You are the only person left.","You decide to go in the forest and build a house.","You live there for 71 years.","'~'"]
+    else:
+        message = [" The lion appraoches.", " You are scared", " The lion attacks", " You step to the side", " The lion falls to the ground", " You attack.", " The lion can't dodge it.", "You won", ":D"]
+    for line in message:
+        print(line)
+        wait(0.75)
 
 def lose(reason):
     print("\n")
@@ -50,16 +57,29 @@ def lose(reason):
 def rollTwoDice(min, max):
     return random.randint(min, max) + random.randint(min,max)
 
+def increaseStats():
+    global atkMax
+    print("\nYour max attack increased by 2!")
+    wait(0.75)
+    atkMax += 1
+    print("It's now", atkMax * 2)
+    wait(0.75)
+    print("Do you want to keep fighting rabits, or do you want to try and fight the lion?")
+    if choose("rabbit", "lion"):
+        combat(rabbit)
+    else:
+        combat(lion)
+
 def combat(enemy):
     yourAttack = rollTwoDice(atkMin, atkMax)
     enemyAttack = rollTwoDice(enemy.minAtk, enemy.maxAtk)
     print("\nYou entered a battle!!")
     wait(0.75)
-    print("You're fighting a " + enemy.name)
+    print("You're fighting a " + enemy.name + "!")
     wait(0.75)
     print("You rolled a " + str(yourAttack) + "!")
     wait(0.75)
-    print("The", enemy.name, "rolled a " + str(enemyAttack))
+    print("The", enemy.name, "rolled a " + str(enemyAttack) + "!")
     wait(0.75)
     if (enemyAttack > yourAttack):
         print("You lost the fight!")
@@ -73,21 +93,13 @@ def combat(enemy):
         wait(0.75)
         if enemy.name == "lion":
             win()
-        else:
-            increaseStats()
-
-def increaseStats():
-    global atkMax
-    print("\nYour max attack increased by 2!")
-    wait(0.75)
-    atkMax += 1
-    print("It's now", atkMax * 2)
-    wait(0.75)
-    print("Do you want to keep fighting rabits, or do you want to try and fight the lion?")
-    if choose("rabbit", "lion"):
-        combat(rabbit)
-    else:
-        combat(lion)
+        else:         
+            global rabbitFightCount
+            rabbitFightCount += 1
+            if rabbitFightCount > 7:
+                lose(deathByWaitingTooLong)
+            else:
+                increaseStats()
 
 def cave():
     print("\nYou enter the cave...")
