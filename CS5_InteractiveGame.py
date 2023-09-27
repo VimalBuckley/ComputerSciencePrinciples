@@ -21,6 +21,7 @@ deathByLion = [" You were obliterated by The Lion in one attack.", " In just thr
 deathByWaitingTooLong = [" You killed the rabbit..."," ...but you hear fighting oustide the cave!"," You realize the lion took over the world while you were fighting rabbits!"," You are the only one left!"," You turn and see the lion"," You have fought 7 rabbits. You can fight the lion...right?"," ...right?"," right?"]
 rabbit = enemy("rabbit", 0,3)
 lion = enemy("lion", 3, 8)
+lion2 = enemy("lion", 10, 16)
 
 def wait(seconds):
     time.sleep(seconds)
@@ -37,7 +38,7 @@ def choose(option1, option2):
     return choice == option1
 
 def win():
-    if rabbitFightCount > 5:
+    if rabbitFightCount > 6:
         message = ["You won, but now what?","You are the only person left.","You decide to go in the forest and build a house.","You live there for 71 years.","'~'"]
     else:
         message = [" The lion appraoches.", " You are scared", " The lion attacks", " You step to the side", " The lion falls to the ground", " You attack.", " The lion can't dodge it.", "You won", ":D"]
@@ -75,31 +76,36 @@ def combat(enemy):
     enemyAttack = rollTwoDice(enemy.minAtk, enemy.maxAtk)
     print("\nYou entered a battle!!")
     wait(0.75)
-    print("You're fighting a " + enemy.name + "!")
+    print("You're fighting a " + enemy.name)
     wait(0.75)
     print("You rolled a " + str(yourAttack) + "!")
     wait(0.75)
-    print("The", enemy.name, "rolled a " + str(enemyAttack) + "!")
+    print("The", enemy.name, "rolled a " + str(enemyAttack))
     wait(0.75)
     if (enemyAttack > yourAttack):
         print("You lost the fight!")
         wait(0.75)
         if enemy.name == "lion":
             lose(deathByLion)
-        else: 
+        else:
             lose(deathByRabbit)  
     else:
         print("You won the fight!")
         wait(0.75)
         if enemy.name == "lion":
             win()
-        else:         
+        else:
             global rabbitFightCount
             rabbitFightCount += 1
-            if rabbitFightCount > 7:
-                lose(deathByWaitingTooLong)
+            if rabbitFightCount > 6:
+                    print("\n")
+                    for line in deathByWaitingTooLong:
+                        print(line)
+                        wait(0.75)
+                    combat(lion2)
             else:
                 increaseStats()
+
 
 def cave():
     print("\nYou enter the cave...")
@@ -134,7 +140,7 @@ def takeTrain():
     if choose("fight", "hide"):
         field()
     else:
-        lose(random.choice(deathByHidingFromAuthorities1, deathByHidingFromAuthorities2))
+        lose(random.choice([deathByHidingFromAuthorities1, deathByHidingFromAuthorities2]))
     
 def talkToMan():
     print("\nYou go over to talk to the man")
