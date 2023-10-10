@@ -1,5 +1,4 @@
 import turtle
-import time
 
 t = turtle.Turtle()
 t2 = turtle.Turtle()
