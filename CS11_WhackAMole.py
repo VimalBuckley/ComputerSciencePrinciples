@@ -74,14 +74,15 @@ def clicked(x,y):
             scoringTurtle.write("Score: " + str(playerScore), font = ("Arial", 20, "normal"))
 
 def setDown():
-    for t in turtles:
-        t2: turtle = t
-        t2.hideturtle()
-        t2.goto(1000,1000)
-    timerTurtle.clear()
-    timerTurtle.home()
-    timerTurtle.write("Game Over", font = ("Arial", 20, "normal"))
-        
+    # for t in turtles:
+    #     t2: turtle = t
+    #     t2.hideturtle()
+    #     t2.goto(1000,1000)
+    # timerTurtle.clear()
+    # timerTurtle.home()
+    # timerTurtle.write("Game Over", font = ("Arial", 20, "normal"))
+    print("Your score was: " + str(playerScore))
+    s.bye()
 
 def dealWithScoring():
     global playerName
@@ -103,6 +104,7 @@ def dealWithScoring():
         if int(scoreList[i]) < int(playerScore) and not foundPlace:
             newNameList.append(playerName)
             newScoreList.append(playerScore)
+            print("You placed #" + str(i+1))
             foundPlace = True
         newNameList.append(nameList[i])
         newScoreList.append(scoreList[i])
