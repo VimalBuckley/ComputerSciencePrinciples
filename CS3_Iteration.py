@@ -1,5 +1,6 @@
 import CS2_Conditionals
 import random
+import os
 
 def rollTwoDiceMultipleTimes(times):
     for i in range(times):
@@ -58,26 +59,33 @@ def rockPaperScissors(firstToWhat):
     allowedInputs = ["Rock", "Paper", "Scissors"]
 
     while playAgain == "y":
+        os.system("cls")
         computerScore = 0
         playerScore = 0
         while firstToWhat > computerScore and firstToWhat > playerScore:
             playerString = input("Rock, Paper, Scissors, Shoot! ")
             while not (playerString in allowedInputs):
                 playerString = input(playerString + " isn't a valid option, pick again." + "\n" + "Rock, Paper, Scissors, Shoot! ")
-            playerIndex = allowedInputs.index(playerString)
-            computerIndex = random.randint(0,2)
-            if playerIndex == computerIndex:
-                print("Tie")
-            elif computerIndex == playerIndex + 1 or computerIndex == playerIndex - 2:
+            computerRandomNumber = random.randint(0,2)
+            for i in range(computerRandomNumber):
+                temp = allowedInputs.copy()
+                allowedInputs.clear()
+                allowedInputs.append(temp[2])
+                allowedInputs.append(temp[0])
+                allowedInputs.append(temp[1])
+            print("You chose", playerString)
+            print("The computer chose", allowedInputs[2])
+            if playerString == allowedInputs[0]:
+                print("You scored")
+                playerScore += 1
+            elif playerString == allowedInputs[1]:
                 print("Computer scored")
                 computerScore += 1
             else:
-                playerScore += 1
-                print("You scored")
-            print("Your score is " + str(playerScore) + ". The computer's score is " + str(computerScore) + ".")
+                print("Tie")
+            print("Your score is " + str(playerScore) + ". \nThe computer's score is " + str(computerScore) + ".\n")
         if (computerScore > playerScore):
             print("Game over. Computer wins " + str(computerScore) + " to " + str(playerScore))
         else:
             print("Game over. Player wins " + str(playerScore) + " to " + str(computerScore))
         playAgain = input("Play again? y or n ")
-

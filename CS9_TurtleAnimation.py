@@ -7,11 +7,11 @@ count = 1
 xPose = 0
 doneOnce = False
 
-s.bgpic("Peter.gif")
+s.bgpic("CS9_Peter.gif")
 s.screensize(1366, 768)
 xCoord = -200
-turtle.register_shape("JoinRobotics.gif")
-t.shape("JoinRobotics.gif")
+turtle.register_shape("CS9_JoinRobotics.gif")
+t.shape("CS9_JoinRobotics.gif")
 t.resizemode("user")
 t.speed(0)
 t.penup()

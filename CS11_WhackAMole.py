@@ -1,31 +1,19 @@
 import turtle
 import random
 import os
-from operator import itemgetter
 
-global xClickThreshold
-global yClickThreshold
-global playerScore
-global timeLeft
-global playerName
-s = turtle.Screen()
-locations = [(-200, 150), (0, 150), (200, 150), (-200, 0), (0,0), (200, 0), (-200, -150), (0, -150), (200, -150)]
+screen = turtle.Screen()
 timerTurtle = turtle.Turtle()
 scoringTurtle = turtle.Turtle()
 turtles = []
 
 def setup(numberOfTurtles):
-    global xClickThreshold
-    global yClickThreshold
     global playerScore
     global timeLeft
-    global playerName
     os.system('cls')
-    xClickThreshold = 10
-    yClickThreshold = 10
     playerScore = 0
     timeLeft = 10
-    s.bgcolor("red")
+    screen.bgcolor("red")
     timerTurtle.penup()
     timerTurtle.hideturtle()
     timerTurtle.speed(0)
@@ -35,14 +23,15 @@ def setup(numberOfTurtles):
     scoringTurtle.speed(0)
     scoringTurtle.goto(-250, 200)
     scoringTurtle.write("Score: " + str(playerScore), font = ("Arial", 20, "normal"))
+    turtles.clear()
     for i in range(numberOfTurtles):
         turtles.append(turtle.Turtle())
     for t in turtles:
         t2: turtle = t
         t2.speed(0)
         t2.penup()
-        turtle.register_shape("MoleV3.gif")
-        t2.shape("MoleV3.gif")
+        turtle.register_shape("CS11_Mole.gif")
+        t2.shape("CS11_Mole.gif")
     randomizeTurtleLocations()
 
 def randomizeTurtleLocations():
@@ -56,7 +45,6 @@ def randomizeTurtleLocations():
 
 def clock():
     global timeLeft
-    
     timeLeft -= 1
     if (timeLeft < 0):
         setDown()
@@ -64,10 +52,12 @@ def clock():
         timerTurtle.clear()
         timerTurtle.write("Time left: " + str(timeLeft), font = ("Arial", 20, "normal"))
         randomizeTurtleLocations()
-        s.ontimer(clock, 1000)
+        screen.ontimer(clock, 1000)
 
 def clicked(x,y):
     global playerScore
+    xClickThreshold = 10
+    yClickThreshold = 10
     for t in turtles:
         t2: turtle = t
         if abs(t2.xcor() - x) < xClickThreshold and abs(t2.ycor() - y) < yClickThreshold:
@@ -79,7 +69,7 @@ def clicked(x,y):
 
 def setDown():
     print("Your score was: " + str(playerScore))
-    s.bye()
+    screen.bye()
 
 def readScores(fileName: str = "CS11_Highscores.txt"):
     fileReader = open(fileName, "r")
@@ -118,47 +108,8 @@ def writeScores(nameScoreList: list, fileName: str = "CS11_Highscores.txt"):
         fileWriter.write(pair[0] + ": " + str(pair[1]) + "\n")
     fileWriter.close()
 
-
-def dealWithScoring():
-    global playerName
-    global playerScore
-    nameList = []
-    scoreList = []
-    nameAndScoreList = []
-    newNameList = []
-    newScoreList = []
-    foundPlace = False
-    playerName = input("What's your name? ")
-    info = open("CS11_Highscores.txt", "r")
-    for line in info:
-        name, score = line.split(",")
-        score = score.split(" ")[0]
-        nameList.append(name)
-        scoreList.append(score)
-        nameAndScoreList.append((name, score))
-    info.close()
-    foundMatch = False
-    for nameScorePair in nameAndScoreList:
-        if nameScorePair[0] == playerName:
-            foundMatch = True
-    for i in range(len(scoreList)):
-        if int(scoreList[i]) < int(playerScore) and not foundPlace:
-            newNameList.append(playerName)
-            newScoreList.append(playerScore)
-            print("You placed #" + str(i+1))
-            foundPlace = True
-        newNameList.append(nameList[i])
-        newScoreList.append(scoreList[i])
-    while len(newNameList) > 5:
-        newNameList.pop()
-        newScoreList.pop()
-    file = open("CS11_Highscores.txt", "w")
-    for i in range(len(nameList)):
-        file.write(newNameList[i] + "," + str(newScoreList[i]) + " \n")
-    file.close()
-
 setup(4)
 clock()
-s.onclick(clicked)
-s.mainloop()
+screen.onclick(clicked)
+screen.mainloop()
 writeScores(updateScores(playerScore, readScores()))
