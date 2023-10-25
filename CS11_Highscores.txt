@@ -1,5 +1,5 @@
 Bob: 17
 Vimal: 16
+i: 9
+Tom: 8
 Placeholder1: 5
-Placeholder2: 4
-Placeholder3: 3
