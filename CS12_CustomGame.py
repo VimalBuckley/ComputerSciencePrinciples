@@ -12,7 +12,7 @@ speed = 10
 score = 0
 maxScore = 0
 accuarcy = 1
-customChart = True
+customChart = False
 oldAccuracy = accuarcy
 myScreen = turtle.Screen()
 myScreen.screensize(500, 500)
