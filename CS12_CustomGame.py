@@ -4,21 +4,44 @@ import random
 from enum import Enum
 import os
 os.system("cls")
-upKey = input("Choose your up keybind\n")
-leftKey = input("Choose your left keybind\n")
-downKey = input("Choose your down keybind\n")
-rightKey = input("Choose your right keybind\n")
+upKey = "w"
+leftKey = "a"
+downKey = "s"
+rightKey = "d"
+speed = 10
+score = 0
+maxScore = 0
+accuarcy = 1
+customChart = True
+oldAccuracy = accuarcy
 myScreen = turtle.Screen()
 myScreen.screensize(500, 500)
+myScreen.title("Game")
 turtles = []
-keysPressed = {"test"}
-keysPressed.discard("test")
+keysPressed = set()
+startingDistance = 400
+fullAccuracyRange = 20
+halfAccuracyRange = 50
+quarterAccuracyRange = 100
+scoringTurtle = turtle.Turtle()
+scoringTurtle.hideturtle()
+scoringTurtle.speed(0)
+scoringTurtle.penup()
+scoringTurtle.goto(-200, 200)
+setupTurtle = turtle.Turtle()
+setupTurtle.hideturtle()
+setupTurtle.speed(0)
+setupTurtle.penup()
+setupTurtle.dot(quarterAccuracyRange, "yellow")
+setupTurtle.dot(halfAccuracyRange, "green")
+setupTurtle.dot(fullAccuracyRange, "blue")
+del(setupTurtle)
 
 class Lane(Enum):
-    RIGHT = ((400, 0), 180)
-    UP = ((0, 400), 270)
-    LEFT = ((-400, 0), 0)
-    DOWN = ((0, -400), 90)
+    RIGHT = ((startingDistance, 0), 180, "pink")
+    UP = ((0, startingDistance), 270, "purple")
+    LEFT = ((-startingDistance, 0), 0, "pink")
+    DOWN = ((0, -startingDistance), 90, "purple")
 
 class NoteReqs():
     def __init__(self, lane: Lane, timeMilliseconds: int):
@@ -35,11 +58,11 @@ class CustomTurtle():
         self.myTurtle.goto(self.lane.value[0])
         self.myTurtle.setheading(self.lane.value[1])
         self.myTurtle.shape("square")
-        self.myTurtle.color("red")
+        self.myTurtle.color(self.lane.value[2])
         self.myTurtle.showturtle()
 
     def moveForward(self):
-        self.myTurtle.forward(5)
+        self.myTurtle.forward(speed)
 
     def distanceFromStart(self):
         return math.dist(self.lane.value[0], self.myTurtle.pos())
@@ -47,11 +70,16 @@ class CustomTurtle():
     def isDone(self):
         if self.distanceFromStart() > 400:
             self.end()
+            global maxScore
+            maxScore += 4
             return True
         return False
 
     def end(self):
         self.myTurtle.hideturtle()
+        if not customChart:
+            createRandomNoteNow()
+        del(self)
 
 def moveTurtles():
     for t in turtles:
@@ -60,21 +88,66 @@ def moveTurtles():
         if (t2.isDone()):
             turtles.pop(0)
 
+def handleInputs():
+    global keysPressed
+    global turtles
+    global score
+    global maxScore
+    for t in turtles:
+        note :CustomTurtle = t
+        dist = startingDistance - note.distanceFromStart()
+        if note.lane not in keysPressed or dist > quarterAccuracyRange:
+            continue
+        if dist < fullAccuracyRange:
+            score += 4
+        elif dist < halfAccuracyRange:
+            score += 2
+        elif dist <= quarterAccuracyRange:
+            score += 1
+        maxScore += 4
+        note.end()
+        turtles.remove(note)
+
+def handleAccuracy():
+    global accuarcy
+    global oldAccuracy
+    if (maxScore != 0):
+        accuarcy = score / maxScore
+    if (accuarcy != oldAccuracy):
+        scoringTurtle.clear()
+        scoringTurtle.write(arg = "Accuracy: " + str(round(accuarcy * 100, 2)) + "%", font = ("Arial", 20, "normal"))
+        oldAccuracy = accuarcy
+
 def gameLoop():
     moveTurtles()
-    myScreen.ontimer(gameLoop, 1)
+    handleInputs()
+    handleAccuracy()
+    myScreen.ontimer(gameLoop, 10)
 
 def testPrint():
     print("Hi")
 
-def createNotes(notes: list = [NoteReqs(Lane.RIGHT, 0)]):
+def createNotes(notes: list = [(Lane.RIGHT, 0)]):
     for possibleNote in notes:
         createNote(possibleNote)
 
-def createNote(note):
-    myScreen.ontimer(lambda : turtles.append(CustomTurtle(note.lane)), note.time)
+def createNote(note: tuple):
+    myScreen.ontimer(lambda : turtles.append(CustomTurtle(note[0])), note[1])
 
-createNotes([])
+def createRandomNoteNow():
+    lanes = [Lane.UP, Lane.LEFT, Lane.DOWN, Lane.RIGHT]
+    createNote((random.choice(lanes), 0))
+
+if customChart:
+    createNotes([
+        (Lane.LEFT, 0),
+        (Lane.RIGHT, 0),
+        (Lane.UP, 324),
+        (Lane.UP, 1256),
+        (Lane.DOWN, 21)
+    ])
+else:
+    createRandomNoteNow()
 gameLoop()
 myScreen.listen()
 myScreen.onkeypress(lambda : keysPressed.add(Lane.UP), upKey)
