@@ -1,4 +1,5 @@
 import turtle
+import threading
 
 size = 50
 speed = 5
@@ -38,5 +39,10 @@ def load_a_turtle(coordinate: tuple):
 coordinates = [
     (0, 0)
 ]
+
+threading.Thread(target=load_a_turtle, args=((100, 100),)).start()
+threading.Thread(target=load_a_turtle, args=((-100, 100),)).start()
+threading.Thread(target=load_a_turtle, args=((100, -100),)).start()
+threading.Thread(target=load_a_turtle, args=((-100, -100),)).start()
 
 my_screen.mainloop()

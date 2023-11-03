@@ -3,39 +3,14 @@ import math
 import random
 from enum import Enum
 import os
+import tkinter
+tkinter.Frame()
 os.system("cls")
-upKey = "w"
-leftKey = "a"
-downKey = "s"
-rightKey = "d"
-speed = 10
-score = 0
-maxScore = 0
-accuarcy = 1
-customChart = False
-oldAccuracy = accuarcy
 myScreen = turtle.Screen()
 myScreen.screensize(500, 500)
 myScreen.title("Game")
 turtles = []
-keysPressed = set()
 startingDistance = 400
-fullAccuracyRange = 20
-halfAccuracyRange = 50
-quarterAccuracyRange = 100
-scoringTurtle = turtle.Turtle()
-scoringTurtle.hideturtle()
-scoringTurtle.speed(0)
-scoringTurtle.penup()
-scoringTurtle.goto(-200, 200)
-setupTurtle = turtle.Turtle()
-setupTurtle.hideturtle()
-setupTurtle.speed(0)
-setupTurtle.penup()
-setupTurtle.dot(quarterAccuracyRange, "yellow")
-setupTurtle.dot(halfAccuracyRange, "green")
-setupTurtle.dot(fullAccuracyRange, "blue")
-del(setupTurtle)
 
 class Lane(Enum):
     RIGHT = ((startingDistance, 0), 180, "pink")
@@ -49,8 +24,9 @@ class NoteReqs():
         self.time = timeMilliseconds
 
 class CustomTurtle():
-    def __init__(self, lane: Lane):
+    def __init__(self, lane: Lane, customChart: bool, speed: int):
         self.lane = lane
+        self.customChart = customChart
         self.myTurtle = turtle.Turtle()
         self.myTurtle.hideturtle()
         self.myTurtle.speed(0)
@@ -61,7 +37,7 @@ class CustomTurtle():
         self.myTurtle.color(self.lane.value[2])
         self.myTurtle.showturtle()
 
-    def moveForward(self):
+    def moveForward(self, speed: int):
         self.myTurtle.forward(speed)
 
     def distanceFromStart(self):
@@ -77,38 +53,42 @@ class CustomTurtle():
 
     def end(self):
         self.myTurtle.hideturtle()
-        if not customChart:
+        if not self.customChart:
             createRandomNoteNow()
         del(self)
 
-def moveTurtles():
+def moveTurtles(speed: int):
     for t in turtles:
         t2: CustomTurtle = t
-        t2.moveForward()
+        t2.moveForward(speed)
         if (t2.isDone()):
             turtles.pop(0)
 
-def handleInputs():
-    global keysPressed
-    global turtles
-    global score
-    global maxScore
+def handleInputs(
+    fullAccRange: int,
+    halfAccRange: int,
+    quarterAccRange: int,
+    keysPressed: list,
+    score: int,
+    maxScore: int
+):
     for t in turtles:
         note :CustomTurtle = t
         dist = startingDistance - note.distanceFromStart()
-        if note.lane not in keysPressed or dist > quarterAccuracyRange:
+        if note.lane not in keysPressed or dist > quarterAccRange:
             continue
-        if dist < fullAccuracyRange:
+        if dist < fullAccRange:
             score += 4
-        elif dist < halfAccuracyRange:
+        elif dist < halfAccRange:
             score += 2
-        elif dist <= quarterAccuracyRange:
+        elif dist <= quarterAccRange:
             score += 1
         maxScore += 4
         note.end()
-        turtles.remove(note)
+        turtles.remove(t)
+    return score, maxScore
 
-def handleAccuracy():
+def handleAccuracy(scoringTurtle: turtle):
     global accuarcy
     global oldAccuracy
     if (maxScore != 0):
@@ -117,15 +97,6 @@ def handleAccuracy():
         scoringTurtle.clear()
         scoringTurtle.write(arg = "Accuracy: " + str(round(accuarcy * 100, 2)) + "%", font = ("Arial", 20, "normal"))
         oldAccuracy = accuarcy
-
-def gameLoop():
-    moveTurtles()
-    handleInputs()
-    handleAccuracy()
-    myScreen.ontimer(gameLoop, 10)
-
-def testPrint():
-    print("Hi")
 
 def createNotes(notes: list = [(Lane.RIGHT, 0)]):
     for possibleNote in notes:
@@ -138,24 +109,79 @@ def createRandomNoteNow():
     lanes = [Lane.UP, Lane.LEFT, Lane.DOWN, Lane.RIGHT]
     createNote((random.choice(lanes), 0))
 
-if customChart:
-    createNotes([
-        (Lane.LEFT, 0),
-        (Lane.RIGHT, 0),
-        (Lane.UP, 324),
-        (Lane.UP, 1256),
-        (Lane.DOWN, 21)
-    ])
-else:
-    createRandomNoteNow()
-gameLoop()
-myScreen.listen()
-myScreen.onkeypress(lambda : keysPressed.add(Lane.UP), upKey)
-myScreen.onkeypress(lambda : keysPressed.add(Lane.DOWN), downKey)
-myScreen.onkeypress(lambda : keysPressed.add(Lane.LEFT), leftKey)
-myScreen.onkeypress(lambda : keysPressed.add(Lane.RIGHT), rightKey)
-myScreen.onkey(lambda : keysPressed.discard(Lane.UP), upKey)
-myScreen.onkey(lambda : keysPressed.discard(Lane.DOWN), downKey)
-myScreen.onkey(lambda : keysPressed.discard(Lane.LEFT), leftKey)
-myScreen.onkey(lambda : keysPressed.discard(Lane.RIGHT), rightKey)
-myScreen.mainloop()
+def getPressedKeys(upKey: str, downKey: str, leftKey: str, rightKey: str):
+    keysPressed = []
+    myScreen.onkeypress(lambda : keysPressed.add(Lane.UP), upKey)
+    myScreen.onkeypress(lambda : keysPressed.add(Lane.DOWN), downKey)
+    myScreen.onkeypress(lambda : keysPressed.add(Lane.LEFT), leftKey)
+    myScreen.onkeypress(lambda : keysPressed.add(Lane.RIGHT), rightKey)
+    return keysPressed
+
+def gameLoop(
+    speed: int,
+    fullAccRange: int,
+    halfAccRange: int,
+    quarterAccRange: int,
+    scoringTurtle: turtle,
+    score: int,
+    maxScore: int
+):
+    moveTurtles(speed)
+    score, maxScore = handleInputs(fullAccRange, halfAccRange, quarterAccRange, getPressedKeys(), score, maxScore)
+    handleAccuracy(scoringTurtle)
+    myScreen.ontimer(lambda: gameLoop(
+        speed,
+        fullAccRange, 
+        halfAccRange, 
+        quarterAccRange, 
+        scoringTurtle,
+        score,
+        maxScore
+    ), 10)
+
+def drawBackground(
+    fullAccRange: int,
+    halfAccRange: int,
+    quarterAccRange: int
+):
+    setupTurtle = turtle.Turtle()
+    setupTurtle.hideturtle()
+    setupTurtle.speed(0)
+    setupTurtle.penup()
+    setupTurtle.dot(quarterAccRange, "yellow")
+    setupTurtle.dot(halfAccRange, "green")
+    setupTurtle.dot(fullAccRange, "blue")
+    del(setupTurtle)
+
+def setupScoring():
+    scoringTurtle = turtle.Turtle()
+    scoringTurtle.hideturtle()
+    scoringTurtle.speed(0)
+    scoringTurtle.penup()
+    scoringTurtle.goto(-200, 200)
+    return scoringTurtle
+
+def setup(
+    upKey: str = "w", 
+    downKey: str = "s", 
+    leftKey: str = "a", 
+    rightKey: str = "d", 
+    customChart: bool = False,
+    speed: int = 10,
+    fullAccRange: int = 20,
+    halfAccRange: int = 50,
+    quarterAccRange: int = 100
+):
+    drawBackground(fullAccRange, halfAccRange, quarterAccRange)
+    if customChart:
+        createNotes([
+            (Lane.RIGHT, 0),
+            (Lane.UP, 100)
+        ])
+    else:
+        createRandomNoteNow()
+    myScreen.listen()
+    gameLoop(speed, fullAccRange, halfAccRange, quarterAccRange, setupScoring())
+    myScreen.mainloop()
+
+setup()
