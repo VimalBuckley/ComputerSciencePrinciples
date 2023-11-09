@@ -3,8 +3,6 @@ import turtle
 import math
 import random
 
-keys_pressed: set = set()
-
 class Lane(Enum):
     RIGHT = ((400, 0), 180, "pink")
     UP = ((0, 400), 270, "purple")
@@ -32,11 +30,11 @@ class Note():
     def distance_from_start(self):
         return math.dist(self.lane.value[0], self.my_turtle.pos())
 
-    def check_if_end(self, note_list: list):
+    def check_if_end(self, note_list: list, max_score: int):
         if self.distance_from_start() > 400:
             self.end(note_list)
-            return 4
-        return 0
+            max_score += 4
+        max_score += 0
     
     def end(self, note_list: list):
         self.my_turtle.hideturtle()
@@ -49,20 +47,21 @@ def start_note_chain(note_list: list, speed: int):
 
 def assign_keybinds(
     screen: turtle._Screen,
+    keys_pressed: set,
     up_key: str,
     left_key: str,
     down_key: str,
     right_key: str
 ):
     screen.listen()
-    screen.onkeypress(lambda: keys_pressed.add("up"), up_key)
-    screen.onkeypress(lambda: keys_pressed.add("left"), left_key)
-    screen.onkeypress(lambda: keys_pressed.add("down"), down_key)
-    screen.onkeypress(lambda: keys_pressed.add("right"), right_key)
-    screen.onkey(lambda: keys_pressed.discard("up"), up_key)
-    screen.onkey(lambda: keys_pressed.discard("left"), left_key)
-    screen.onkey(lambda: keys_pressed.discard("down"), down_key)
-    screen.onkey(lambda: keys_pressed.discard("right"), right_key)
+    screen.onkeypress(lambda: keys_pressed.add(Lane.UP), up_key)
+    screen.onkeypress(lambda: keys_pressed.add(Lane.LEFT), left_key)
+    screen.onkeypress(lambda: keys_pressed.add(Lane.DOWN), down_key)
+    screen.onkeypress(lambda: keys_pressed.add(Lane.RIGHT), right_key)
+    screen.onkey(lambda: keys_pressed.discard(Lane.UP), up_key)
+    screen.onkey(lambda: keys_pressed.discard(Lane.LEFT), left_key)
+    screen.onkey(lambda: keys_pressed.discard(Lane.DOWN), down_key)
+    screen.onkey(lambda: keys_pressed.discard(Lane.RIGHT), right_key)
 
 def draw_ranges(
     fullAccRange: int,
@@ -79,36 +78,74 @@ def draw_ranges(
     drawing_turtle.dot(fullAccRange, "blue")
     del drawing_turtle
 
+def draw_acc(
+    scoring_turtle: turtle.Turtle,
+    acc: int = 100
+):
+    scoring_turtle.hideturtle()
+    scoring_turtle.speed(0)
+    scoring_turtle.penup()
+    scoring_turtle.goto(-200, 200)
+    scoring_turtle.clear()
+    scoring_turtle.write(arg = "Accuracy: " + str(acc) + "%", font = ("Arial", 20, "normal"))
+
 def handle_inputs(
     note_list: list,
+    keys_pressed: set,
     full_acc_range: int,
     half_acc_range: int,
-    quarter_acc_range: int
-):
-    for note in note_list:
-        
-
-def game_loop(
-    screen: turtle._Screen, 
-    note_list: list, 
-    full_acc_range: int, 
-    half_acc_range: int, 
     quarter_acc_range: int,
     score: int,
     max_score: int
 ):
+    for n in note_list:
+        note: Note = n
+        dist = 400 - note.distance_from_start()
+        if dist > quarter_acc_range or note.lane not in keys_pressed:
+            continue
+        if dist < full_acc_range:
+            score += 4
+        elif dist < half_acc_range:
+            score += 2
+        elif dist <= quarter_acc_range:
+            score += 1
+        max_score += 4
+        note.end(note_list)
+
+def game_loop(
+    screen: turtle._Screen, 
+    keys_pressed: set, 
+    full_acc_range: int, 
+    half_acc_range: int, 
+    quarter_acc_range: int,
+    scoring_turtle: turtle.Turtle = turtle.Turtle(),
+    note_list: list = [],
+    score: int = 0,
+    max_score: int = 0,
+    accuracy: int = 0
+):
     for note in note_list:
         note.move_forward()
-        max_score += note.check_if_end(note_list)
+        note.check_if_end(note_list, max_score)
+    # handle_inputs(note_list, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, score, max_score)
+    # if max_score != 0 and accuracy != round((100 * score / max_score), 5):
+    #     accuracy = round((100 * score / max_score), 5)
+    #     draw_acc(scoring_turtle, accuracy)
+
+    print("er")
+    print(len(note_list))
     screen.ontimer(
         lambda: game_loop(
-            screen, 
-            note_list, 
+            screen,
+            keys_pressed, 
             full_acc_range, 
             half_acc_range, 
             quarter_acc_range,
+            scoring_turtle,
+            note_list,
             score,
-            max_score
+            max_score,
+            accuracy
         ),
         10
     )
@@ -127,8 +164,10 @@ def setup(
     my_screen = turtle.Screen()
     my_screen.screensize(500, 500)
     note_list = []
+    keys_pressed = set()
     assign_keybinds(
         my_screen,
+        keys_pressed,
         up_key,
         left_key,
         down_key,
@@ -141,7 +180,7 @@ def setup(
     )
     if not do_custom_chart:
         start_note_chain(note_list, speed)
-    game_loop(my_screen, note_list)
+    game_loop(my_screen, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range)
     my_screen.mainloop()
 
 setup() 
