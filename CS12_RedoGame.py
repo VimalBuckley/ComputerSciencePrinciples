@@ -10,7 +10,7 @@ class Lane(Enum):
     DOWN = ((0, -400), 90, "purple")
 
 class Note():
-    def __init__(self, lane: Lane, speed: int, newNoteOnClick: bool):
+    def __init__(self, lane: Lane = Lane.RIGHT, speed: int = 10, newNoteOnClick: bool = False):
         self.lane = lane
         self.speed = speed
         self.newNoteOnClick = newNoteOnClick
@@ -136,9 +136,6 @@ def game_loop(
         note.move_forward()
         score, max_score = note.check_if_end(note_list, score, max_score, scoring_turtle)
     score, max_score = handle_inputs(note_list, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, score, max_score, scoring_turtle)
-    # if max_score != 0 and accuracy != round((100 * score / max_score), 5):
-    #     accuracy = round((100 * score / max_score), 5)
-    #     draw_acc(scoring_turtle, accuracy)
 
     screen.ontimer(
         lambda: game_loop(
@@ -160,7 +157,6 @@ def setup(
     left_key: str = "a",
     down_key: str = "s",
     right_key: str = "d",
-    custom_chart: list = None,
     speed: int = 10,
     full_acc_range: int = 20,
     half_acc_range: int = 50,
@@ -183,11 +179,7 @@ def setup(
         half_acc_range,
         quarter_acc_range
     )
-    if custom_chart == None:
-        start_note_chain(note_list, speed)
-    else:
-        for note in custom_chart:
-            my_screen.ontimer(lambda: note_list.append(note[0]), note[1])
+    start_note_chain(note_list, speed)
     game_loop(my_screen, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, note_list=note_list)
     my_screen.mainloop()
 
