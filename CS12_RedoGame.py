@@ -44,6 +44,15 @@ class Note():
         if self.newNoteOnClick:
             start_note_chain(note_list, self.speed)
 
+class CustomChartNote():
+    def __init__(self, lane: Lane, speed: int, time: int):
+        self.lane = lane
+        self.speed = speed
+        self.time = time
+
+def make_note_at_time(screen: turtle._Screen,note_list: list, lane: Lane, speed: int, time: int):
+    screen.ontimer(lambda: note_list.append(Note(lane, speed, False)), time)
+
 def start_note_chain(note_list: list, speed: int):
     note_list.append(Note(random.choice(list(Lane)), speed, True))
 
@@ -92,7 +101,7 @@ def draw_acc(
     scoring_turtle.clear()
     acc = 100
     if max_score != 0:
-        acc = round((100 * score / max_score), 5)
+        acc = round((100 * score / max_score), 2)
     scoring_turtle.write(arg = "Accuracy: " + str(acc) + "%", font = ("Arial", 20, "normal"))
 
 def handle_inputs(
@@ -153,6 +162,7 @@ def game_loop(
     )
     
 def setup(
+    custom_chart: list = None,
     up_key: str = "w",
     left_key: str = "a",
     down_key: str = "s",
@@ -179,8 +189,18 @@ def setup(
         half_acc_range,
         quarter_acc_range
     )
-    start_note_chain(note_list, speed)
+    if custom_chart is None:
+        start_note_chain(note_list, speed)
+    else:
+        for n in custom_chart:
+            custom_note: CustomChartNote = n
+            make_note_at_time(my_screen, note_list, custom_note.lane, custom_note.speed, custom_note.time)
     game_loop(my_screen, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, note_list=note_list)
     my_screen.mainloop()
 
-setup() 
+example_custom_chart = [
+    CustomChartNote(Lane.RIGHT, 10, 1000),
+    CustomChartNote(Lane.LEFT, 10, 500)
+]
+
+setup()
