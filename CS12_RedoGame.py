@@ -30,11 +30,13 @@ class Note():
     def distance_from_start(self):
         return math.dist(self.lane.value[0], self.my_turtle.pos())
 
-    def check_if_end(self, note_list: list, max_score: int):
+    def check_if_end(self, note_list: list, score: int, max_score: int, scoring_turtle: turtle.Turtle):
         if self.distance_from_start() > 400:
             self.end(note_list)
             max_score += 4
+            draw_acc(scoring_turtle, score, max_score)
         max_score += 0
+        return score, max_score
     
     def end(self, note_list: list):
         self.my_turtle.hideturtle()
@@ -73,20 +75,24 @@ def draw_ranges(
     drawing_turtle.speed(0)
     drawing_turtle.penup()
     drawing_turtle.home()
-    drawing_turtle.dot(quarterAccRange, "yellow")
-    drawing_turtle.dot(halfAccRange, "green")
-    drawing_turtle.dot(fullAccRange, "blue")
+    drawing_turtle.dot(2 * quarterAccRange, "yellow")
+    drawing_turtle.dot(2 * halfAccRange, "green")
+    drawing_turtle.dot(2 * fullAccRange, "blue")
     del drawing_turtle
 
 def draw_acc(
     scoring_turtle: turtle.Turtle,
-    acc: int = 100
+    score: int = 0,
+    max_score: int = 0
 ):
     scoring_turtle.hideturtle()
     scoring_turtle.speed(0)
     scoring_turtle.penup()
     scoring_turtle.goto(-200, 200)
     scoring_turtle.clear()
+    acc = 100
+    if max_score != 0:
+        acc = round((100 * score / max_score), 5)
     scoring_turtle.write(arg = "Accuracy: " + str(acc) + "%", font = ("Arial", 20, "normal"))
 
 def handle_inputs(
@@ -96,7 +102,8 @@ def handle_inputs(
     half_acc_range: int,
     quarter_acc_range: int,
     score: int,
-    max_score: int
+    max_score: int,
+    scoring_turtle: turtle.Turtle
 ):
     for n in note_list:
         note: Note = n
@@ -110,7 +117,9 @@ def handle_inputs(
         elif dist <= quarter_acc_range:
             score += 1
         max_score += 4
+        draw_acc(scoring_turtle, score, max_score)
         note.end(note_list)
+    return score, max_score
 
 def game_loop(
     screen: turtle._Screen, 
@@ -121,19 +130,16 @@ def game_loop(
     scoring_turtle: turtle.Turtle = turtle.Turtle(),
     note_list: list = [],
     score: int = 0,
-    max_score: int = 0,
-    accuracy: int = 0
+    max_score: int = 0
 ):
     for note in note_list:
         note.move_forward()
-        note.check_if_end(note_list, max_score)
-    # handle_inputs(note_list, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, score, max_score)
+        score, max_score = note.check_if_end(note_list, score, max_score, scoring_turtle)
+    score, max_score = handle_inputs(note_list, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, score, max_score, scoring_turtle)
     # if max_score != 0 and accuracy != round((100 * score / max_score), 5):
     #     accuracy = round((100 * score / max_score), 5)
     #     draw_acc(scoring_turtle, accuracy)
 
-    print("er")
-    print(len(note_list))
     screen.ontimer(
         lambda: game_loop(
             screen,
@@ -144,8 +150,7 @@ def game_loop(
             scoring_turtle,
             note_list,
             score,
-            max_score,
-            accuracy
+            max_score
         ),
         10
     )
@@ -155,7 +160,7 @@ def setup(
     left_key: str = "a",
     down_key: str = "s",
     right_key: str = "d",
-    do_custom_chart: bool = False,
+    custom_chart: list = None,
     speed: int = 10,
     full_acc_range: int = 20,
     half_acc_range: int = 50,
@@ -178,9 +183,12 @@ def setup(
         half_acc_range,
         quarter_acc_range
     )
-    if not do_custom_chart:
+    if custom_chart == None:
         start_note_chain(note_list, speed)
-    game_loop(my_screen, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range)
+    else:
+        for note in custom_chart:
+            my_screen.ontimer(lambda: note_list.append(note[0]), note[1])
+    game_loop(my_screen, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, note_list=note_list)
     my_screen.mainloop()
 
 setup() 
