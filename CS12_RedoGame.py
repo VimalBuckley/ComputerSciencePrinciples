@@ -141,10 +141,20 @@ def game_loop(
     score: int = 0,
     max_score: int = 0
 ):
-    for note in note_list:
+    for n in note_list:
+        note: Note = n
         note.move_forward()
         score, max_score = note.check_if_end(note_list, score, max_score, scoring_turtle)
-    score, max_score = handle_inputs(note_list, keys_pressed, full_acc_range, half_acc_range, quarter_acc_range, score, max_score, scoring_turtle)
+    score, max_score = handle_inputs(
+        note_list, 
+        keys_pressed, 
+        full_acc_range, 
+        half_acc_range, 
+        quarter_acc_range, 
+        score, 
+        max_score, 
+        scoring_turtle
+    )
 
     screen.ontimer(
         lambda: game_loop(
@@ -200,7 +210,8 @@ def setup(
 
 example_custom_chart = [
     CustomChartNote(Lane.RIGHT, 10, 1000),
-    CustomChartNote(Lane.LEFT, 10, 500)
+    CustomChartNote(Lane.LEFT, 10, 500),
+    CustomChartNote(Lane.DOWN, 10, 2000)
 ]
 
 setup()
