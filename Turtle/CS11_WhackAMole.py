@@ -31,8 +31,8 @@ def setup(numberOfTurtles, time):
         t2: turtle = t
         t2.speed(0)
         t2.penup()
-        turtle.register_shape("CS11_Mole.gif")
-        t2.shape("CS11_Mole.gif")
+        turtle.register_shape("Turtle/Pictures/CS11_Mole.gif")
+        t2.shape("Turtle/Pictures/CS11_Mole.gif")
     randomizeTurtleLocations() # Move the turtles to random locations
 
 def randomizeTurtleLocations(): # Randomizes turtle locations
@@ -73,7 +73,7 @@ def setDown(): # Prints a message telling the player their score
     print("Your score was: " + str(playerScore))
     screen.bye() # Closes the turtle window
 
-def readScores(fileName: str = "CS11_Highscores.txt"): # Function to read scores from the files storing scores
+def readScores(fileName: str = "Turtle/Text/CS11_Highscores.txt"): # Function to read scores from the files storing scores
     fileReader = open(fileName, "r") # Open the file to read
     nameScoreList = [] # Create an empty list of name score pairs
     for line in fileReader:
@@ -104,7 +104,7 @@ def updateScores(playerScore: int, oldNameScoreList: list): # Function to update
         nameScoreList.pop()
     return nameScoreList # Hand back the updated list
 
-def writeScores(nameScoreList: list, fileName: str = "CS11_Highscores.txt"): # Function to write the new highscores to the file
+def writeScores(nameScoreList: list, fileName: str = "Turtle/Text/CS11_Highscores.txt"): # Function to write the new highscores to the file
     fileWriter = open(fileName, "w") # Open the file to write
     for pair in nameScoreList: # Write each pair
         fileWriter.write(pair[0] + ": " + str(pair[1]) + "\n")
