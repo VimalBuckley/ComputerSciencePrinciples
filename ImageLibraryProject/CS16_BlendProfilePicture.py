@@ -21,7 +21,12 @@ def roundImage(imageToMask: Image, borderPercent: float):
     final.paste(imageToMask, (0, 0), mask)
     return final
   
-def main(radius: int, images:list):
+def main():
+    os.chdir("ImageLibraryProject/Pictures To Profile")
+    radius = 600
+    images = []
+    for image in os.listdir():
+        images.append(Image.open(image).resize((radius, radius)))
     angle = 2 * math.pi / len(images)
     mask = Image.new(mode="RGBA", size=(radius, radius), color=(0,0,0,0,))
     drawableMask = ImageDraw.Draw(mask)
@@ -30,7 +35,6 @@ def main(radius: int, images:list):
             (radius / 2, radius / 2),
             (radius, radius / 2),
             (radius, radius / 2 * (1 - math.tan(angle)))
-            
         ],
         "red"
     )
@@ -43,9 +47,4 @@ def main(radius: int, images:list):
     rounded.save("ProfilePicture.png")
     
 if __name__ == "__main__":
-    os.chdir("ImageLibraryProject/Pictures To Profile")
-    radius = 600
-    images = []
-    for image in os.listdir():
-        images.append(Image.open(image).resize((radius, radius)))
-    main(radius, images)
+    main()
