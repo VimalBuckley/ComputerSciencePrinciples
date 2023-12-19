@@ -1,5 +1,6 @@
-from PIL import Image, ImageDraw, ImageChops
+from PIL import Image, ImageDraw
 import math
+import os, os.path
 
 def roundImage(imageToMask: Image, borderPercent: float):
     mask = Image.new("RGBA", imageToMask.size, (0, 0, 0, 0))
@@ -19,30 +20,10 @@ def roundImage(imageToMask: Image, borderPercent: float):
     final = Image.new(mode = "RGBA", size=imageToMask.size, color=(0, 0, 0 ,0))
     final.paste(imageToMask, (0, 0), mask)
     return final
-
-# def main(size: tuple, images: list):
-#     angle = math.pi * 2 / len(images)
-#     print(math.degrees(angle))
-#     mask = Image.new("RGBA", size, (0,0,0,0))
-#     drawable = ImageDraw.Draw(mask)
-#     drawable.polygon(
-#         [
-#             (size[0] / 2, size[1] / 2),
-#             (size[0], size[1] / 2),
-#             (size[0], size[1] / 2 - size[0] / 2 * math.tan(angle))
-#         ],
-#         "red"
-#     )
-#     for i in range(7):
-#         rotated = mask.rotate(45 + 45 * i)
-#         mask.paste(rotated, mask=rotated)
-    
-#     roundImage(mask, 0.5).show()
-    
+  
 def main(radius: int, images:list):
     angle = 2 * math.pi / len(images)
-    empty = Image.new("RGBA", (radius, radius), (0, 0, 0, 0))
-    mask = Image.new("RGBA", (radius, radius), (0, 0, 0, 0))
+    mask = Image.new(mode="RGBA", size=(radius, radius), color=(0,0,0,0,))
     drawableMask = ImageDraw.Draw(mask)
     drawableMask.polygon(
         [
@@ -53,10 +34,18 @@ def main(radius: int, images:list):
         ],
         "red"
     )
-    
+    image = Image.new("RGBA", (radius, radius), (0,0,0,0))
     for i in range(len(images)):
-        
+        image.paste(images[i], mask=mask.rotate(math.degrees(angle) * i))
+    rounded = roundImage(image, 0.5)
+    os.chdir("..")
+    rounded.show()
+    rounded.save("ProfilePicture.png")
     
-
 if __name__ == "__main__":
-    main((600, 600), [1, 1, 1, 1, 1, 1, 1, 1])
+    os.chdir("ImageLibraryProject/Pictures To Profile")
+    radius = 600
+    images = []
+    for image in os.listdir():
+        images.append(Image.open(image).resize((radius, radius)))
+    main(radius, images)
