@@ -1,9 +1,6 @@
-characters: list = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", " ", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ".", ",", "?", "!", "'"]
-
+# characters: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789.,?!'"
+characters: str = "abcdefghijklmnopqrstuvwxyz"
 def encrypt(message: str, shift: int):
-    badCharacters = [letter for letter in message if letter not in characters]
-    if len(badCharacters) != 0:
-        raise Exception("The messaged contained unrecognized characters:", badCharacters)
     return "".join(characters[loopIndex(characters.index(letter), shift, len(characters))] for letter in message)
 
 def decrypt(encryptedMessage: str, shift: int):
@@ -12,7 +9,23 @@ def decrypt(encryptedMessage: str, shift: int):
 def bruteForce(encryptedMessage: str):
     for index in range(len(characters)):
         print(decrypt(encryptedMessage, index))
-    
+
+def standardEncrypt(message: str, shift: int):
+    encryptedMessage = []
+    for letter in message:
+        if letter == " ":
+            encryptedMessage.append(" ")
+        else:
+            encryptedMessage.append(characters[loopIndex(characters.index(letter), shift, len(characters))])
+    return "".join(encryptedMessage)
+
+def standardDecrypt(message: str, shift:int):
+    return standardEncrypt(message, -shift)    
+
+def standardBruteForce(message: str):
+    for index in range(len(characters)):
+        print(standardDecrypt(message, index))
+
 def loopIndex(inital: int, shift: int, length: int):
     if inital < 0:
         inital = 0
@@ -25,8 +38,21 @@ def loopIndex(inital: int, shift: int, length: int):
         sum += length
     return sum
 
-shift = 156
-encrypted = encrypt("My name is Vimal!", shift)
-decrypted = decrypt(encrypted, shift)
-print(encrypted)
-print(decrypted)
+def UI():
+    action: str = input("Would you like to encrypt or decrypt?\nType encrypt or decrypt:") + "ed"
+    if not action == "encrypted" and not action == "decrypted":
+        raise Exception("Please choose a valid action: encrypt or decrypt")
+    try:
+        shift: int = int(input("What is the shift?"))
+    except:
+        raise Exception("Your shift must be a valid number!")
+    phrase: str = input("What is the phrase to be " +  action + "?")
+    badCharacters = [letter for letter in phrase if letter not in characters]
+    if len(badCharacters) != 0:
+        raise Exception("The messaged contained unrecognized characters:", badCharacters)
+    if action == "encrypted":
+        print(encrypt(phrase, shift))
+    else:
+        print(decrypt(phrase, shift))
+
+UI()
