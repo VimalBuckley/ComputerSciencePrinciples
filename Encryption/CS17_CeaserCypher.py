@@ -1,5 +1,5 @@
-# characters: str = "ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz0123456789.,?!'"
-characters: str = "abcdefghijklmnopqrstuvwxyz"
+characters: str = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()`~-=_+[]\;',./}{|:<>? "
+shortCharacters: str = "abcdefghijklmnopqrstuvwxyz"
 def encrypt(message: str, shift: int):
     return "".join(characters[loopIndex(characters.index(letter), shift, len(characters))] for letter in message)
 
@@ -16,14 +16,14 @@ def standardEncrypt(message: str, shift: int):
         if letter == " ":
             encryptedMessage.append(" ")
         else:
-            encryptedMessage.append(characters[loopIndex(characters.index(letter), shift, len(characters))])
+            encryptedMessage.append(shortCharacters[loopIndex(shortCharacters.index(letter), shift, len(shortCharacters))])
     return "".join(encryptedMessage)
 
 def standardDecrypt(message: str, shift:int):
     return standardEncrypt(message, -shift)    
 
 def standardBruteForce(message: str):
-    for index in range(len(characters)):
+    for index in range(len(shortCharacters)):
         print(standardDecrypt(message, index))
 
 def loopIndex(inital: int, shift: int, length: int):
@@ -39,7 +39,7 @@ def loopIndex(inital: int, shift: int, length: int):
     return sum
 
 def UI():
-    action: str = input("Would you like to encrypt or decrypt?\nType encrypt or decrypt:") + "ed"
+    action: str = input("Would you like to encrypt or decrypt?\nType encrypt or decrypt: ") + "ed"
     if not action == "encrypted" and not action == "decrypted":
         raise Exception("Please choose a valid action: encrypt or decrypt")
     try:
