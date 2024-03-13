@@ -66,7 +66,7 @@ class CustomTurtle():
 
     def distanceFromStart(self):
         return math.dist(self.lane.value[0], self.myTurtle.pos())
-    
+
     def isDone(self):
         if self.distanceFromStart() > 400:
             self.end()
