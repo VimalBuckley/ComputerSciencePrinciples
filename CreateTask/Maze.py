@@ -13,7 +13,6 @@ class Wall:
     def __init__(self, row: int, column: int):
         self.row = row
         self.column = column
-        self.shown = False
         self.turt = turtle.Turtle(visible=False)
         self.turt.penup()
         self.turt.speed(0)
@@ -24,7 +23,13 @@ class Wall:
         self.turt.showturtle()
     
     def check(self):
-        pass
+        if (maze[playerRow + self.row][playerColumn + self.column]):
+            print("yes")
+            self.turt.showturtle()
+        else:
+            print("no")
+            self.turt.hideturtle()
+
 
 screen = turtle.Screen()
 screen.setup(600, 600)
@@ -60,4 +65,35 @@ player.shapesize(6, 6, 1)
 player.color("red")
 player.penup()
 player.showturtle()
+playerColumn = 3
+playerRow = 3
+for wall in walls:
+    wall.check()
+
+def up():
+    playerRow - 1
+    print(playerRow)
+    for wall in walls:
+        wall.check()
+def down():
+    playerRow + 1
+    print(playerRow)
+    for wall in walls:
+        wall.check()
+def right():
+    playerColumn + 1
+    print(playerColumn)
+    for wall in walls:
+        wall.check()
+def left():
+    playerColumn - 1
+    print(playerColumn)
+    for wall in walls:
+        wall.check()
+
+screen.onkeypress(lambda: up(), "w")
+screen.onkeypress(lambda: down(), "s")
+screen.onkeypress(lambda: left(), "a")
+screen.onkeypress(lambda: right(), "d")
+screen.listen()
 screen.mainloop()
