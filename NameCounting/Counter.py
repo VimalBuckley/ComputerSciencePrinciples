@@ -10,10 +10,8 @@ class Person:
             self.map[year] = 0
             reader = open("yob" + str(year) + ".txt", "r")
             for line in reader:
-                if line.split(",")[0] == self.getName():
+                if (line.split(",")[1] == self.name):
                     self.addData(year, int(line.split(",")[2]))
-                else:
-                    self.addData(year, 0)
             reader.close()
     def getName(self):
         return self.name
@@ -32,11 +30,11 @@ class Person:
 os.chdir("NameCounting")
 os.system("cls")
 totalCount = 0
-person = Person("Mary")
+person = Person("M")
 plt.plot(range(1880, 2021), person.getData(), "b-")
-person2 = Person("John")
-plt.plot(range(1880, 2021), person2.getData(), "r-")
-plt.title("Number of People Born in Each Year Since 1880")
+person = Person("F")
+plt.plot(range(1880, 2021), person.getData(), "r-")
+plt.title("Number of People Born in Each Year Since 1880\n Male (Blue) | Female (Red)")
 plt.xlabel("Year")
 plt.ylabel("Frequency")
 plt.show()
