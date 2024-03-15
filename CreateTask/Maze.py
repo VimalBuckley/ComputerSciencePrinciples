@@ -24,41 +24,13 @@ class Wall:
     
     def check(self):
         if (maze[playerRow + self.row][playerColumn + self.column]):
-            print("yes")
             self.turt.showturtle()
         else:
-            print("no")
             self.turt.hideturtle()
 
 
 screen = turtle.Screen()
 screen.setup(600, 600)
-walls = [
-    Wall(-2, -2),
-    Wall(-2, -1),
-    Wall(-2, 0),
-    Wall(-2, 1),
-    Wall(-2, 2),
-    Wall(-1, -2),
-    Wall(-1, -1),
-    Wall(-1, 0),
-    Wall(-1, 1),
-    Wall(-1, 2),
-    Wall(0, -2),
-    Wall(0, -1),
-    Wall(0, 1),
-    Wall(0, 2),
-    Wall(1, -2),
-    Wall(1, -1),
-    Wall(1, 0),
-    Wall(1, 1),
-    Wall(1, 2),
-    Wall(2, -2),
-    Wall(2, -1),
-    Wall(2, 0),
-    Wall(2, 1),
-    Wall(2, 2)
-]
 player = turtle.Turtle(visible=False)
 player.shape("square")
 player.shapesize(6, 6, 1)
@@ -67,33 +39,23 @@ player.penup()
 player.showturtle()
 playerColumn = 3
 playerRow = 3
+walls = [Wall(row, column) for row in range(-2, 3) for column in range(-2, 3) if not (row == 0 and column == 0)]
 for wall in walls:
     wall.check()
-
-def up():
-    playerRow - 1
-    print(playerRow)
-    for wall in walls:
-        wall.check()
-def down():
-    playerRow + 1
-    print(playerRow)
-    for wall in walls:
-        wall.check()
-def right():
-    playerColumn + 1
-    print(playerColumn)
-    for wall in walls:
-        wall.check()
-def left():
-    playerColumn - 1
-    print(playerColumn)
+def move(deltaRow: int, deltaColumn: int):
+    global playerRow
+    global playerColumn
+    playerRow += deltaRow
+    playerColumn += deltaColumn
+    if (maze[playerRow][playerColumn]):
+        playerRow -= deltaRow
+        playerColumn -= deltaColumn
     for wall in walls:
         wall.check()
 
-screen.onkeypress(lambda: up(), "w")
-screen.onkeypress(lambda: down(), "s")
-screen.onkeypress(lambda: left(), "a")
-screen.onkeypress(lambda: right(), "d")
+screen.onkeypress(lambda: move(-1, 0), "w")
+screen.onkeypress(lambda: move(1, 0), "s")
+screen.onkeypress(lambda: move(0, -1), "a")
+screen.onkeypress(lambda: move(0, 1), "d")
 screen.listen()
 screen.mainloop()
