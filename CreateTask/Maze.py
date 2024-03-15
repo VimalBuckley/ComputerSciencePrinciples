@@ -30,6 +30,7 @@ class Wall:
 
 
 screen = turtle.Screen()
+screen.tracer(0, 0)
 screen.setup(600, 600)
 player = turtle.Turtle(visible=False)
 player.shape("square")
@@ -40,8 +41,6 @@ player.showturtle()
 playerColumn = 3
 playerRow = 3
 walls = [Wall(row, column) for row in range(-2, 3) for column in range(-2, 3) if not (row == 0 and column == 0)]
-for wall in walls:
-    wall.check()
 def move(deltaRow: int, deltaColumn: int):
     global playerRow
     global playerColumn
@@ -52,10 +51,11 @@ def move(deltaRow: int, deltaColumn: int):
         playerColumn -= deltaColumn
     for wall in walls:
         wall.check()
-
+    screen.update()
 screen.onkeypress(lambda: move(-1, 0), "w")
 screen.onkeypress(lambda: move(1, 0), "s")
 screen.onkeypress(lambda: move(0, -1), "a")
 screen.onkeypress(lambda: move(0, 1), "d")
 screen.listen()
+move(0, 0)
 screen.mainloop()
