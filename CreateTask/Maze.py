@@ -10,21 +10,12 @@ mazeHeight = 0
 mazeWidth = 0
 startTime = 0
 walls = []
+maze = []
 class Tile(Enum):
     SPACE = (False, "white")
     WALLL = (True, "black")
     ENDDD = (False, "red")
     START = (False, "green")
-
-maze = [
-    [Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE],
-    [Tile.SPACE, Tile.SPACE, Tile.ENDDD, Tile.WALLL, Tile.WALLL, Tile.SPACE, Tile.SPACE], 
-    [Tile.SPACE, Tile.WALLL, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.WALLL, Tile.SPACE], 
-    [Tile.SPACE, Tile.WALLL, Tile.SPACE, Tile.START, Tile.SPACE, Tile.WALLL, Tile.SPACE], 
-    [Tile.SPACE, Tile.WALLL, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.WALLL, Tile.SPACE], 
-    [Tile.SPACE, Tile.SPACE, Tile.WALLL, Tile.SPACE, Tile.WALLL, Tile.SPACE, Tile.SPACE],
-    [Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.SPACE]
-]
 
 class Wall:
     def __init__(self, row: int, column: int):
@@ -40,18 +31,16 @@ class Wall:
         self.turt.showturtle()
     
     def updateColor(self):
-        # if not (
-        #     playerRow + self.row < 0 or playerRow + self.row > mazeHeight or
-        #     playerColumn + self.column < 0 or playerColumn + self.column > mazeWidth
-        # ):
         if checkInbounds(playerRow + self.row, playerColumn + self.column):
             self.turt.color(maze[playerRow + self.row][playerColumn + self.column].value[1])
         else:
             self.turt.color("black")
 
-def startGame():
+def startGame(mazeToPlay: list[list[Tile]]):
     global walls
     global startTime
+    global maze
+    maze = mazeToPlay
     checkMaze()
     screen.tracer(0, 0)
     screen.setup(600, 600)
@@ -134,4 +123,12 @@ def move(deltaRow: int, deltaColumn: int):
             screen.bye()
             end()
 
-startGame()
+maze1 = [
+    [Tile.WALLL, Tile.ENDDD, Tile.WALLL, Tile.WALLL, Tile.WALLL], 
+    [Tile.WALLL, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.WALLL], 
+    [Tile.WALLL, Tile.SPACE, Tile.START, Tile.SPACE, Tile.WALLL], 
+    [Tile.WALLL, Tile.SPACE, Tile.SPACE, Tile.SPACE, Tile.WALLL], 
+    [Tile.WALLL, Tile.WALLL, Tile.WALLL, Tile.WALLL, Tile.WALLL],
+]
+
+startGame(maze1)
