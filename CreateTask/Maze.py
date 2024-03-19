@@ -12,10 +12,10 @@ startTime = 0
 walls = []
 maze = []
 class Tile(Enum):
-    SPACE = (False, "white")
-    WALLL = (True, "black")
-    ENDDD = (False, "red")
-    START = (False, "green")
+    SPACE = "white"
+    WALLL = "black"
+    ENDDD = "red"
+    START = "green"
 
 class Wall:
     def __init__(self, row: int, column: int):
@@ -32,7 +32,7 @@ class Wall:
     
     def updateColor(self):
         if checkInbounds(playerRow + self.row, playerColumn + self.column):
-            self.turt.color(maze[playerRow + self.row][playerColumn + self.column].value[1])
+            self.turt.color(maze[playerRow + self.row][playerColumn + self.column].value)
         else:
             self.turt.color("black")
 
@@ -48,12 +48,15 @@ def startGame(mazeToPlay: list[list[Tile]]):
     player.shapesize(6, 6, 1)
     player.color("blue")
     player.penup()
-    player.showturtle()
     walls = [Wall(row, column) for row in range(-2, 3) for column in range(-2, 3) if not (row == 0 and column == 0)]
     screen.onkeypress(lambda: move(-1, 0), "w")
     screen.onkeypress(lambda: move(1, 0), "s")
     screen.onkeypress(lambda: move(0, -1), "a")
     screen.onkeypress(lambda: move(0, 1), "d")
+    screen.onkeypress(lambda: move(-1, 0), "W")
+    screen.onkeypress(lambda: move(1, 0), "S")
+    screen.onkeypress(lambda: move(0, -1), "A")
+    screen.onkeypress(lambda: move(0, 1), "D")
     screen.onkeypress(lambda: move(-1, 0), "Up")
     screen.onkeypress(lambda: move(1, 0), "Down")
     screen.onkeypress(lambda: move(0, -1), "Left")
@@ -66,12 +69,11 @@ def startGame(mazeToPlay: list[list[Tile]]):
 def checkMaze():
     '''
     Makes sure that the maze fits all the criteria of being a maze, to minimize bugs during gameplay\n
-    These include:\n
-    \t- All rows are the same length\n
-    \t- There is exactly one start tile\n
-    \t- There is at least one end tile\n
+    These being:\n
+    \tAll rows are the same length\n
+    \tThere is exactly one start tile\n
+    \tThere is at least one end tile\n
     '''
-    
     global playerColumn
     global playerRow
     global mazeHeight
@@ -118,8 +120,6 @@ def move(deltaRow: int, deltaColumn: int):
                 wall.updateColor()
             screen.update()
         elif nextTile == Tile.ENDDD:
-            playerRow += deltaRow
-            playerColumn += deltaColumn
             screen.bye()
             end()
 
